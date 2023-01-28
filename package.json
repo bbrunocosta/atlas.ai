@@ -8,6 +8,9 @@
   "author": "Bruno Costa",
   "license": "ISC",
   "private": false,
+  "scripts": {
+    "start": "node src/index.js"
+  },
   "dependencies": {
     "dotenv": "^16.0.3",
     "openai": "^3.1.0",
