@@ -1,5 +1,6 @@
 import * as responseTypes from "./responseTypes.js";
-
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 export const sendResponseAsText = (client, message, text ) => client.sendText(
     message.from === process.env.WHATSAPP_PHONE_NUMBER ? message.to : message.from,

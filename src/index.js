@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 import { onAnyMessage } from './whatsapp/index.js';
 import * as commands from './commands/index.js';
 import { createBot } from  './whatsapp/index.js'
