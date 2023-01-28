@@ -1,0 +1,16 @@
+{
+  "name": "zap-gpt",
+  "version": "1.0.0",
+  "description": "Integração Chat-GPT com WhatsApp.",
+  "type": "module",
+  "main": "index.js",
+  "repository": "https://github.com/bbrunocosta",
+  "author": "Bruno Costa",
+  "license": "ISC",
+  "private": false,
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "openai": "^3.1.0",
+    "venom-bot": "^4.3.7"
+  }
+}
