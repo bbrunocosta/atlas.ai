@@ -1,11 +1,9 @@
 import { create } from 'venom-bot';
 
 
-const start = async client => client.onAnyMessage( console.lot );
-
-create({
+const options = {
     session: 'chat-gpt',
     multidevice: true
-})
-.then(start)
-.catch( console.log );
+}
+
+export const create = () => create(options)
