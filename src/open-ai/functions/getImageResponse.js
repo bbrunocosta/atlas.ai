@@ -3,50 +3,55 @@ import openAi  from '../openai-client.js'
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
-export const getImageResponse = async (prompt) => {    
-    const options = {
-        model: "dall-e-3",
-        prompt,
-        n: 1,
-        size: "1024x1024"
-    };
 
-    try {
+export const getImageResponse = async ({client, venomMessage, userRequest, message }) => {    
+
+    try {   
+
+        await client.startTyping(venomMessage.from)
+        await client.sendText(venomMessage.from, message)
+        const options = {
+            model: "dall-e-3",
+            prompt: userRequest,
+            n: 1,
+            size: "1024x1024"
+        };
+
         const response = await openAi.images.generate(options);
-        // Retorna a URL da imagem gerada
-
+        
+        
+        await client.startTyping(venomMessage.from)
         const imageResponse = await axios({
             url: response.data[0].url,
             method: 'GET',
-            responseType: 'arraybuffer' // 🚀 Stream para evitar salvar no disco
+            responseType: 'arraybuffer'
         });
 
-
-        // 🔥 Converte `arraybuffer` para `Buffer` antes de transformar para Base64
         const buffer = Buffer.from(imageResponse.data); 
         const base64Image = `data:image/png;base64,${buffer.toString("base64")}`; 
-
 
 
         const imageMetadata = z.object({
             fileName: z.string(),
             caption: z.string(),
         });
-        
-        
+
+        await client.startTyping(venomMessage.from)
         const metadataResponse = await openAi.chat.completions.create({
-            model: "gpt-4o-mini", // Modelo mais econômico que suporta JSON
+            model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system", content: [
-                        { type: "text", text: `O usuário solicitou a criação de uma imagem com o seguinte a seguir:` },
-                        { type: "text", text: `prompt: "${prompt}"` },
-                        { type: "text", text: ` Você é responsável por analisar a imagem gerada e gerar metadata!` },
-                        { type: "text", text: `Voce deve responder no mesmo idioma do prompt!` }
+                        { type: "text", text: `O usuário solicitou a criação de uma imagem` },
+                        { type: "text", text: `Você é responsável por analisar a imagem gerada e gerar metadata!` },
+                        { type: "text", text: `Voce deve responder no mesmo idioma do userRequest!` }
                     ]
                 },
                 {
                   role: "user", content: [
+                    {
+                        type: "text", text: `userRequest: ${userRequest}`
+                    },
                     {
                         type: "image_url",
                         image_url: {
@@ -63,19 +68,17 @@ export const getImageResponse = async (prompt) => {
 
         const {fileName, caption} = JSON.parse(metadataResponse.choices[0].message.content)
 
-
-        return {
-            responseType: 'img',
+        await client.startTyping(venomMessage.from)
+        await client.sendImageFromBase64(
+            venomMessage.from,
+            base64Image,
             fileName,
-            data: base64Image,
-            text: caption
-        } 
+            caption
+        );
     } catch (e) {
+        await client.sendText(venomMessage.from, `❌ Erro ao gerar imagem: ${e.response?.data?.error?.message || e.message}`)
         console.error(e);
-        return {
-            responseType: 'text',
-            text: `❌ Erro ao gerar imagem: ${e.response?.data?.error?.message || e.message}`
-        };
     }
 };
+
 

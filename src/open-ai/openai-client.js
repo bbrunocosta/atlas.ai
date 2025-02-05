@@ -1,6 +1,6 @@
+import OpenAI from 'openai';
 import * as dotenv from 'dotenv'
 dotenv.config()
-import OpenAI from 'openai';
 
 const configuration = {
     organization: process.env.OPEN_AI_ORGANIZATION_ID,

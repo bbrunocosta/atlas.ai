@@ -1,9 +1,9 @@
 import { create } from 'venom-bot';
 
-const options = {
+export const options = {
     session: 'chat-gpt',
-    multidevice: true,
+    multidevice: false,
     browserArgs: ['--headless=new', '--no-sandbox', '--disable-setuid-sandbox']
 }
 
-export const createBot = () => create(options)
+export const createVenomBot = () => create(options)
