@@ -1,4 +1,5 @@
 import { getImageResponse } from './functions/getImageResponse.js'
+import { waitUntilUserFinishSpeaking } from './functions/waitUntilUserFinishSpeaking.js'
 const functions = [
     {
         name: "getImageResponse",
@@ -12,6 +13,11 @@ const functions = [
             required: ["userRequest", "message"]
         },
         call:  getImageResponse
+    },
+    {
+        name: "waitUntilUserFinishSpeaking",
+        description: "Aguarda o usuário terminar de falar",
+        call:  waitUntilUserFinishSpeaking
     }
 ]
 
