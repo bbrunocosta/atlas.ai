@@ -26,6 +26,7 @@ export default async function({client, venomMessage}) {
     
     if(!message.function_call)
     {
+        await client.stopTyping(venomMessage.from)
         await  client.sendText(venomMessage.from, message.content)
         await markMessagesAsReplied(venomMessage.from)
         return;
