@@ -1,5 +1,5 @@
 import { getImageResponse } from './functions/getImageResponse.js'
-import { waitUntilUserFinishSpeaking } from './functions/waitUntilUserFinishSpeaking.js'
+import { waitForMillisecondsThenAnswerWithText } from './functions/waitForMillisecondsThenAnswerWithText.js'
 const functions = [
     {
         name: "getImageResponse",
@@ -15,9 +15,17 @@ const functions = [
         call:  getImageResponse
     },
     {
-        name: "waitUntilUserFinishSpeaking",
-        description: "Aguarda o usuário terminar de falar",
-        call:  waitUntilUserFinishSpeaking
+        name: "waitForMillisecondsThenAnswerWithText",
+        description: "Aguarda uma quantidade de tempo e, caso o usuário não responda, envia uma mensagem.",
+        parameters: {
+          type: "object",
+          properties: {
+            "milliseconds": { "type": "number", "description": "Tempo em milissegundos para aguardar." },
+            "message": { "type": "string", "description": "A mensagem que você deseja enviar." }
+          },
+          required: ["milliseconds", "message"]
+        },
+        call:  waitForMillisecondsThenAnswerWithText
     }
 ]
 

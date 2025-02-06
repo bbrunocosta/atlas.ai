@@ -56,15 +56,16 @@ export async function getChatHistory(chatId) {
   };
 }
 
-export async function getLastMessages(chatId) {
-  const messages = await db.all(
-    `SELECT role, content FROM messages 
-     WHERE chatId = ? AND isReplied = 0
-     ORDER BY timestamp ASC`
+export async function getLastMessage(chatId) {
+  const result = await db.all(
+    `SELECT * FROM messages 
+     WHERE chatId = ?
+     ORDER BY timestamp DESC
+     LIMIT 1`
     ,[chatId]
   );
-
-  return messages;
+  console.log(result)
+  return result[0];
 }
 
 export async function markMessagesAsReplied(chatId) {
