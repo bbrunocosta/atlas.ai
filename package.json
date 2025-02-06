@@ -12,6 +12,7 @@
     "start": "node src/index.mjs"
   },
   "dependencies": {
+    "@wppconnect-team/wppconnect": "^1.35.2",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "openai": "^4.82.0",
