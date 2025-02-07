@@ -39,10 +39,10 @@ export async function getChatHistory(chatId) {
   const result = await db.all(
     `
       SELECT 
-        JSON_GROUP_ARRAY(JSON_OBJECT('chatId', chatId, 'messageId', messageId, 'role', role, 'timestamp', timestamp, 'content', content ))
+        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content ))
         FILTER (WHERE isReplied = 1) AS replied,
 
-        JSON_GROUP_ARRAY(JSON_OBJECT('chatId', chatId, 'messageId', messageId,'role', role, 'timestamp', timestamp, 'content', content )) 
+        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content )) 
         FILTER (WHERE isReplied = 0) AS notReplied
       FROM messages
       WHERE chatId = ?;
@@ -51,8 +51,8 @@ export async function getChatHistory(chatId) {
   );
 
   return {
-    replied: JSON.parse(result[0].replied || '[]').map(item => ({role: item.role, content: JSON.stringify(item)})),
-    notReplied: JSON.parse(result[0].notReplied || '[]').map(item => ({role: item.role, content: JSON.stringify(item)}))
+    replied: JSON.parse(result[0].replied || '[]'),
+    notReplied: JSON.parse(result[0].notReplied || '[]')
   };
 }
 
