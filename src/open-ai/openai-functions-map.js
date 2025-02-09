@@ -8,9 +8,10 @@ const functions = [
             type: "object",
             properties: {
                 userRequest: { type: "string", description: "Texto completo que o usuário te enviou" },
-                message: { type: "string", description: "Uma mensagem para o usuário em primeira pessoa solciando de forma objetiva para aguardar " }
+                message: { type: "string", description: "Uma mensagem para o usuário em primeira pessoa solciando de forma objetiva para aguardar " },
+                responseLanguage: { type: "string", description: "O idioma do texto enviado pelo usuário" }
             },
-            required: ["userRequest", "message"]
+            required: ["userRequest", "message", "responseLanguage"]
         },
         call:  getImageResponse
     },

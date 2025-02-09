@@ -21,6 +21,34 @@ await db.exec(`
   );
 `);
 
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS usage (
+    chatId TEXT PRIMARY KEY,
+    amountSpent REAL
+  );
+`);
+
+export async function getUsage(chatId) {
+  const result = await db.get(
+    `SELECT amountSpent FROM usage
+     WHERE chatId = ?`,
+    [chatId]
+  );
+  return result ? result.amountSpent : 0;
+}
+
+export async function addUsage(chatId, amountSpent) {
+  const result = await db.get(
+    `INSERT INTO usage (chatId, amountSpent)
+     VALUES (?, ?)
+     ON CONFLICT(chatId) DO UPDATE 
+     SET amountSpent = amountSpent + ? 
+     RETURNING amountSpent`,
+    [chatId, amountSpent, amountSpent]
+  );
+  return result;
+}
+
 
 export async function saveMessage({ messageId, chatId, content, role, isReplied }) {
   const result = await db.run(
