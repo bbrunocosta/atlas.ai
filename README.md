@@ -1,7 +1,16 @@
-# AI WhatsApp Integration
 
+<p align="center">
+      <img src="https://repository-images.githubusercontent.com/594485098/da696f60-dc49-4007-8ccb-19d077cc2062" width="500">
+</p>
+
+<a href="https://wa.me/5511930584364" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="12" height="12" style="vertical-align: middle;">
+  Clique aqui para testar!
+</a>
+
+
+# Atlas - AI WhatsApp Integration
 🚀 **WhatsApp Integration with OpenAI's Chat-GPT** 🚀
-
 Seamlessly integrate OpenAI's Chat-GPT with WhatsApp, allowing users to interact with an AI assistant for text-based responses and AI-generated images using DALL·E.
 
 ---
