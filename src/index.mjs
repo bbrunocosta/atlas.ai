@@ -15,8 +15,8 @@ try
   client.onPresenceChanged((args) => {
     if(!args) return;
 
-    if(args.state === 'unavailable' && pendingMessages.messages.has(args.id)){
-      waitSecondsThenRunAgent(5, args.id)
+    if(process.env.NODE_ENV !== 'maintenance' && args.state === 'unavailable' && pendingMessages.messages.has(args.id)) {
+      waitSecondsThenRunAgent(3, args.id)
     }
     
     else if(pendingMessages.clocks.has(args.id)) {
@@ -36,10 +36,20 @@ try
       isReplied: message.fromMe ? 1 : 0
     })
 
+
     
     if(messageWasSaved && !message.fromMe) {
-      pendingMessages.messages.set(message.from, message)
-      waitSecondsThenRunAgent(5, message.from)
+      if(process.env.NODE_ENV === 'maintenance') {
+        client.sendText(message.from, `📢 Aviso de Manutenção 🚧
+Olá! No momento, estou passando por uma manutenção para melhorar minhas habilidades e serviços. 🔧
+Peço desculpas pelo transtorno e agradeço  a sua paciência. Estarei de volta em breve! ⏳
+Se precisar de mais informações, fique à vontade para entrar em contato com o Bruno.
+O WhatsAp dele é:
+☎️ +55 11 95996-3068`)
+        }else {
+          pendingMessages.messages.set(message.from, message)
+          waitSecondsThenRunAgent(10, message.from)
+        }
     }
   })
 }
@@ -56,6 +66,8 @@ function waitSecondsThenRunAgent(seconds, chatId){
     clearTimeout(pendingMessages.clocks.get(chatId))
     pendingMessages.clocks.delete(chatId);
   }
+
+
 
   pendingMessages.clocks.set(chatId, setTimeout(async () => {
     const message = pendingMessages.messages.get(chatId)
