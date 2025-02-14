@@ -1,58 +1,88 @@
-# zap-gpt
-WhatsApp integration with OpenAI Chat GPT for personal use at your fingertips
-# How to inicialize this project
+# AI WhatsApp Integration
 
-### 1) Configuring ".env" file
-Let's start setting up all enviroment variables needed for this project to work.
-In the project root folder, create a file called ".env" 
-and fill the variables as shown in this code below.
+🚀 **WhatsApp Integration with OpenAI's Chat-GPT** 🚀
 
-```js
+Seamlessly integrate OpenAI's Chat-GPT with WhatsApp, allowing users to interact with an AI assistant for text-based responses and AI-generated images using DALL·E.
+
+---
+
+## 📌 Features
+
+✅ AI-powered text responses using **GPT-4o-mini**  
+✅ AI-generated images using **DALL·E 3**  
+✅ Smooth integration with WhatsApp via **WPPConnect**  
+✅ SQLite database for chat history tracking  
+✅ Usage-based credit system for limiting interactions  
+✅ Simple setup and deployment  
+
+---
+
+## 🛠️ Setup & Installation
+
+### 1️⃣ Configure Environment Variables
+
+Start by setting up the required environment variables. In the project's root directory, create a `.env` file and add the following details:
+
+```ini
 OPEN_AI_API_KEY="your-api-key"
 OPEN_AI_ORGANIZATION_ID="your-organization-id"
-WHATSAPP_PHONE_NUMBER=your-whatsapp-number  like -> 553144448888@c.us
+WHATSAPP_PHONE_NUMBER=your-whatsapp-number  # Example: 553144448888@c.us
 ```
-In order to get the OpenAi OrganizationId and ApiKey you first need to create an OpenAi accont and then visit the following links:
 
-#### ApiKey
-https://beta.openai.com/account/api-keys
+📌 **How to get OpenAI credentials?**
+- **API Key:** [Get it here](https://beta.openai.com/account/api-keys)
+- **Organization ID:** [Find it here](https://beta.openai.com/account/org-settings)
 
-#### OrganizationId
-https://beta.openai.com/account/org-settings
+💡 *An example file `.env.example` is included in the project with the same template.*
 
+---
 
-There is a file called .env.example with the same exemple shown above.
+### 2️⃣ Install Dependencies
 
-### 2) Start the application
-Now that all enviroment variables are set, you can start the projet. Run the terminal command "yarn start" in the root folder of your project
+Before running the project, ensure you have **Node.js** installed and install all required dependencies using **Yarn**:
 
+```sh
+yarn install
+```
 
-```terminal
+---
+
+### 3️⃣ Start the Application
+
+Once all environment variables are configured, start the project by running:
+
+```sh
 yarn start
 ```
 
-the proram will start and a QR code will show up on the terminal.
-just scan the QrCode as a new device of you WhatsApp app.
+This will generate a **QR Code** in the terminal. Scan this QR Code using your WhatsApp application to establish the connection.
 
-### 3) Execute a commannd
+✅ **Once authenticated, the bot will be ready to process your commands!**
 
-There are two types of commands that you can play with:
+---
 
-**/imagine** - use it in order to generate images! <Br>
-it uses  Dall-E witch is a AI that generates images 
-```whatsapp
-/imagine A black cat
-```
-with this request the bot will try to answare with a image.
+## 📜 Technologies Used
 
+🔹 **[WPPConnect](https://wppconnect.io/)** - WhatsApp API integration  
+🔹 **[OpenAI](https://openai.com/)** - AI text & image generation  
+🔹 **SQLite** - Lightweight database for chat history tracking  
+🔹 **Zod** - Data validation  
+🔹 **Axios** - HTTP requests  
+🔹 **Puppeteer** - Headless browser automation  
 
-<br>
-<br>
-**/bot** - use it in order to generate text!
-<br>
-it uses Davinci witch is a AI that generate text
+---
 
-```whatsapp
-/bot How is the whether now?
-```
-with this question the bot will try to answare with a text message.
+## 👨‍💻 Author
+
+🔹 **Bruno Costa** - [GitHub](https://github.com/bbrunocosta)  
+
+If you find this project useful, feel free to ⭐ star it on GitHub!
+
+---
+
+## 🔥 Future Improvements
+
+🔸 Enable the bot to process all message types, including *audio, video, and documents*
+
+📌 *Have a suggestion? Open an issue or contribute to the project!* 🚀
+
