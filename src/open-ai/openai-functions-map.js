@@ -1,6 +1,12 @@
+import {getBalance} from './functions/getBalance.js'
 import { getImageResponse } from './functions/getImageResponse.js'
 import { waitForMillisecondsThenAnswerWithText } from './functions/waitForMillisecondsThenAnswerWithText.js'
 const functions = [
+    {
+        name: 'consultarSaldoEmCreditos',
+        description: "Consulta qual o saldo em creditos o usuário ainda tem disponivel para uso.",
+        call:  getBalance
+    },
     {
         name: "getImageResponse",
         description: "Gera uma imagem baseada na solicitação do usuário.",
