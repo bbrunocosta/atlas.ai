@@ -14,8 +14,6 @@ try
 {
   client.onPresenceChanged((args) => {
     if(!args) return;
-    
-    console.log(args.state, pendingMessages.messages.has(args.id), pendingMessages.clocks.has(args.id))
 
     if(args.state === 'unavailable' && pendingMessages.messages.has(args.id)){
       waitSecondsThenRunAgent(5, args.id)
@@ -37,8 +35,8 @@ try
       role: message.fromMe ? 'assistant' : 'user',
       isReplied: message.fromMe ? 1 : 0
     })
-    console.log( 'onAnyMessage', !message.fromMe,  messageWasSaved)
 
+    
     if(messageWasSaved && !message.fromMe) {
       pendingMessages.messages.set(message.from, message)
       waitSecondsThenRunAgent(5, message.from)
