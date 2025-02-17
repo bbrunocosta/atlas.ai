@@ -15,6 +15,9 @@ await db.exec(`
     messageId TEXT,
     chatId TEXT,
     content TEXT,
+    image TEXT,
+    audio TEXT,
+    mimeType TEXT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     role TEXT CHECK(role IN ('user', 'assistant')), 
     isReplied INTEGER DEFAULT 0
@@ -50,12 +53,14 @@ export async function addUsage(chatId, amountSpent) {
 }
 
 
-export async function saveMessage({ messageId, chatId, content, role, isReplied }) {
+
+export async function saveMessage({messageId, chatId, content, role, isReplied, image, mimeType, audio}) { 
+  
   const result = await db.run(
-    `INSERT INTO messages (messageId, chatId, content, role, isReplied)
-     SELECT ?, ?, ?, ?, ?
+    `INSERT INTO messages (messageId, chatId, content, role, isReplied, image, mimeType, audio)
+     SELECT ?, ?, ?, ?, ?, ?, ?, ?
      WHERE NOT EXISTS (SELECT 1 FROM messages WHERE messageId = ?)`,
-    [messageId, chatId, content, role, isReplied, messageId] // messageId is passed twice
+    [messageId, chatId, content, role, isReplied, image, mimeType, audio, messageId]
   );
 
   return result.changes > 0
@@ -67,10 +72,10 @@ export async function getChatHistory(chatId) {
   const result = await db.all(
     `
       SELECT 
-        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content ))
+        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content, 'image', image, 'audio', audio ))
         FILTER (WHERE isReplied = 1) AS replied,
 
-        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content )) 
+        JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'content', content, 'image', image, 'audio', audio )) 
         FILTER (WHERE isReplied = 0) AS notReplied
       FROM messages
       WHERE chatId = ?;
