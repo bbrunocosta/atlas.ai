@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import * as dotenv from 'dotenv'
+
 dotenv.config()
 
 const db = await open({
@@ -27,28 +28,31 @@ await db.exec(`
 await db.exec(`
   CREATE TABLE IF NOT EXISTS usage (
     chatId TEXT PRIMARY KEY,
-    amountSpent REAL
+    credits REAL NOT NULL DEFAULT 1000
   );
 `);
 
-export async function getUsage(chatId) {
+
+export async function getCredits(chatId) {
   const result = await db.get(
-    `SELECT amountSpent FROM usage
+    `SELECT credits FROM usage
      WHERE chatId = ?`,
     [chatId]
   );
-  return result ? result.amountSpent : 0;
+  console.log(Math.trunc(result?.credits))
+  return Math.trunc(result?.credits);
 }
 
-export async function addUsage(chatId, amountSpent) {
+export async function upsertCredits(chatId, amountSpent, isRecharge = false) {
   const result = await db.get(
-    `INSERT INTO usage (chatId, amountSpent)
-     VALUES (?, ?)
+    `INSERT INTO usage (chatId)
+     VALUES (?)
      ON CONFLICT(chatId) DO UPDATE 
-     SET amountSpent = amountSpent + ? 
-     RETURNING amountSpent`,
-    [chatId, amountSpent, amountSpent]
+     SET credits = credits ${ isRecharge ? '+' : '-' } ?
+     RETURNING credits`,
+    [chatId, amountSpent]
   );
+  
   return result;
 }
 
@@ -82,12 +86,12 @@ export async function getChatHistory(chatId) {
     `
     ,[chatId]
   );
-
-  return {
-    replied: JSON.parse(result[0].replied || '[]'),
-    notReplied: JSON.parse(result[0].notReplied || '[]')
-  };
+  const replied = JSON.parse(result[0].replied || '[]')
+  const notReplied = JSON.parse(result[0].notReplied || '[]')
+  return { replied, notReplied, isFirstInteraction: !replied.length && ! notReplied.length }
 }
+
+
 
 export async function getLastMessage(chatId) {
   const result = await db.all(
@@ -97,7 +101,6 @@ export async function getLastMessage(chatId) {
      LIMIT 1`
     ,[chatId]
   );
-  console.log(result)
   return result[0];
 }
 

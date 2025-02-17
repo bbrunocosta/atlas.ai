@@ -1,16 +1,27 @@
-import { getChatHistory, getUsage, markMessagesAsReplied } from '../data/sqlite-repository.js';
-import { calculateAndSaveUsage, exceedUsage, notifyLimitReached } from './usageManager.js';
+import { getChatHistory, getCredits, markMessagesAsReplied } from '../data/sqlite-repository.js';
 import openAi  from './openai-client.js'
-import functions from './openai-functions-map.js'
 import usageInfo from './info-usage.js'
 import brunoInfo from './info-bruno-costa.js'
 export default async function({client, venomMessage}) {
     const chatHistory = await getChatHistory(venomMessage.from)
     const isFirstInteraction = !chatHistory.replied.length
     
-    const initialAmountSpent = await getUsage(venomMessage.from)
-    if(exceedUsage(initialAmountSpent)){
-        await notifyLimitReached(client, venomMessage)
+    if(await getCredits(venomMessage.from) <= 0 ) {
+        await client.stopTyping(venomMessage.from)
+  
+  
+        await client.sendText(venomMessage.from, `😲 Ops! Parece que você atingiu o meu limite de uso... 
+      
+      Eu adoraria continuar essa conversa, mas, por enquanto, não posso mais interagir. Mas olha, se gostou do que viu por aqui, que tal entrar em contato com o Bruno 📩🥹🙏🏼? 
+      Ele me criou e está pronto para novos desafios.
+      `)
+        await client.sendText(
+          venomMessage.from,
+          `🧑🏻‍💻 +55 11 95996-3068\nhttps://linkedin.com/in/bbrunocosta`
+        );
+      
+      
+        await client.sendText(venomMessage.from, `Deixei o LinkedIn e o telefone dele para vocês se falarem, ok?!☎️ \n\nObrigado, foi incrível conversar com você! 🚀🤖`)
         return;
     }
 
@@ -47,8 +58,7 @@ export default async function({client, venomMessage}) {
             ]): []
         ],
         temperature: 1,
-        max_tokens: 4000,
-        functions: Array.from(functions.values())
+        max_tokens: 4000
     };
 
     await client.startTyping(venomMessage.from)
