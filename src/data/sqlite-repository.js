@@ -114,3 +114,35 @@ export async function markMessagesAsReplied(chatId) {
 }
 
 
+
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS translations(
+    lang TEXT,
+    id TEXT,
+    text TEXT,
+    PRIMARY KEY (lang, id)
+  );
+`);
+
+export async function getTranslation(id, lang){
+  const result = await db.get(
+    `SELECT text FROM translations WHERE id = ? AND lang = ?`,
+    [id, lang]
+  );
+  return result?.text
+}
+
+
+export async function upsertTranslation(id, lang, text){
+  const result = await db.get(
+    `INSERT INTO translations (id, lang, text) 
+    VALUES (?, ?, ?)
+    ON CONFLICT(id,lang) DO UPDATE 
+    SET text = excluded.text
+    RETURNING text`,
+    [id, lang, text]
+  );
+  return result?.text
+}
+
