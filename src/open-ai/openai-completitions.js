@@ -4,7 +4,12 @@ import z from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod';
 import generateBalanceResponse from './tools/functions/generateBalanceResponse.js'
 import generateImageResponse from './tools/functions/generateImageResponse.js'
-import waitForMillisecondsThenSaySomething from './tools/functions/waitForMillisecondsThenSaySomething.js'
+import handleMisunderstanding from './tools/functions/handleMisunderstanding.js'
+import infoBrunoCosta from './settings/info-bruno-costa.js';
+import infoAtlas from './settings/info-atlas.js';
+import infoUsage from './settings/info-usage.js';
+import infoDateTime from './settings/info-date-time.js';
+import infoWhatsapp from './settings/info-whatsapp.js';
 
 export default {
   generateAtlasResponse,
@@ -12,15 +17,13 @@ export default {
   generateTranslation
 }
 
-function mapToOpenAiMessages(chatHistory){
-  return [...chatHistory.replied.map(mapMessage),...chatHistory.notReplied.map(mapMessage)]
-}
 
-function mapMessage({role, content, image, audio}) {
+function mapMessage({role, content, image, }) {
   const message = {
     role, 
     content: []
   }
+
   if(content){
     message.content.push({ 
       type: 'text', 
@@ -28,7 +31,6 @@ function mapMessage({role, content, image, audio}) {
     })
   }
 
-  // if(role === 'user' && image) {
   if(image) {
     message.content.push({ 
       type: 'image_url', 
@@ -43,30 +45,28 @@ function mapMessage({role, content, image, audio}) {
 export async function generateAtlasResponse(chatHistory) {
   
   const imageMetadata = z.object({
-    lang: z.string(),
-    response_type: z.enum(['audio', 'text']),
-    message: z.string(),
+    lang: z.string().describe("The language the user wants to speak."),
+    response_type: z.enum(['audio', 'text']).describe("Whether the message should be sent in text or audio"),
+    message: z.string().describe("The response for the user's last query in text, in the same language as 'lang'."),
   });
   
-  const history = mapToOpenAiMessages(chatHistory)
+  
   const options = {
     model: "gpt-4o-mini",
     messages: [
-      { 
-        role: 'system', content: [
-        {type: 'text', text: 'You are talking on whatsapp.'},
-        {type: 'text', text: `You can:\n` + 
-          `- See images and talk about its content.\n` +
-          `- Read images content and and speak by returing the text and setting the response_type to audio.\n` +
-          `- speak, read or  send audio by providing the response_type as audio.\n` +
-          `- speak or send text providing the response_type as text\n\n` +
-          `- For balance,  credits or usage never rely on the history, instead use function_call`
-        },
-        {type: 'text', text: 'The field lang determine the language the user whats to speak.'},
-        {type: 'text', text: 'The message is the response for the user last query in text and same language as lang.'},
-
-      ]},
-      ...history,
+      { role: 'developer', content: infoBrunoCosta },
+      { role: 'developer', content: infoAtlas },
+      { role: 'developer', content: infoUsage },
+      { role: 'developer', content: infoDateTime(chatHistory) },
+      { role: 'developer', content: infoWhatsapp},
+      { role: 'developer', content: 'Here is your past messages with the user!' },
+      ...chatHistory.replied.map(mapMessage),
+      { role: 'developer', content: 'The chat starts from here!\n' + 
+        chatHistory.isFirstInteraction
+        ?'This is your fist message to the user. You sould do a brief introduction of yourself.'
+        :''
+      },
+      ...chatHistory.notReplied.map(mapMessage),
     ],
     response_format: zodResponseFormat(imageMetadata, "response"),
     temperature: 0.5,
@@ -74,19 +74,16 @@ export async function generateAtlasResponse(chatHistory) {
     tools: [
       generateBalanceResponse,
       generateImageResponse,
-      waitForMillisecondsThenSaySomething
+      handleMisunderstanding
     ]
   }
-  
-  if(chatHistory.isFirstInteraction) options.messages.push({
-    role: 'system', 
-    content: 'this is your fist interaction. make a ' 
-  })
 
+  
   const response = await openAi.chat.completions.create(options);
+  console.dir(options.messages, {depth: null})
   console.dir(response, {depth: null})
+
   const { tool_calls = null, content = null } = response.choices[0].message
-  console.dir(tool_calls, {depth: null})
   const amountSpent = usage.calculateCost(response, options)
   return {
     tool_calls, 
@@ -139,7 +136,7 @@ async function generateTranslation(text, lang) {
     messages: [
       { role: "system", content: [
         { type: "text", text: `You are an excelent Translator` },
-        { type: "text", text: `Respond **only** with the translated text. Do not add any explanations, introductions, confirmations, or extra words."` }
+        { type: "text", text: `Respond *only* with the translated text. Do not add any explanations, introductions, confirmations, or extra words."` }
       ] },
       { 
         role: "user", 

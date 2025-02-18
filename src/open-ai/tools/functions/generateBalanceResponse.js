@@ -10,7 +10,7 @@ export default {
         properties: {
           input: { 
             type: "string", 
-            description: `the exact Translation for this text in the same lang of user: 'Your current balance is {0} créditos' do not modify the number!`
+            description: `the exact Translation for this text in the same lang of user: 'Your current balance is 0 créditos' do not modify the number!`
           },                           
           response_type: {
             type: 'string',
@@ -23,7 +23,7 @@ export default {
     },
     async call ({client, message, response_type, input, lang }) {
       const balance = await repository.getCredits(message.from)
-      const balanceMessage = input.replace('{0}', balance)
+      const balanceMessage = input.replace(/\d+/g, balance)
       await client.sendTextOrBase64AudioPtt({
         message, response_type, input: balanceMessage, lang
       })

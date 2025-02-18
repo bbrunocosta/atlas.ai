@@ -88,7 +88,7 @@ export async function getChatHistory(chatId) {
   );
   const replied = JSON.parse(result[0].replied || '[]')
   const notReplied = JSON.parse(result[0].notReplied || '[]')
-  return { replied, notReplied, isFirstInteraction: !replied.length && ! notReplied.length }
+  return { chatId, replied, notReplied, isFirstInteraction: !replied.length }
 }
 
 
