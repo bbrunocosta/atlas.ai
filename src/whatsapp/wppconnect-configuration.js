@@ -48,11 +48,10 @@ export const createWppconnectBot = async () => {
         async stopRecording (chatId) { 
           await client.stopRecoring(chatId)
         },
-        async sendErrorMessage() {
-          console.log('Enviando mensagem de erro')
-        },
-        async sendBase64ImageWithTextOrAudioCaption({message, base64Image, fileName, caption, response_type}) 
+        async sendBase64ImageWithTextOrAudioCaption({message, lang, base64Image, fileName, caption, response_type}) 
         {
+          try
+          {
             switch(response_type)
             {
               case 'text': 
@@ -78,12 +77,18 @@ export const createWppconnectBot = async () => {
               break;
               
               default:
-                await this.sendErrorMessage(message)
+                await this.sendErrorMessage(message, response_type, lang, `send_nessage_error` )
               break;
             }
+          }
+          catch(error) {
+            console.dir(error, {depth: null})
+            await this.sendErrorMessage(message, response_type, lang, `send_nessage_error` )
+          }
         },
 
-        async sendTextOrBase64AudioPtt({message, response_type, input, shouldSave = undefined}) {
+        async sendTextOrBase64AudioPtt({message, response_type, input, lang,shouldSave = undefined}) {
+          try {
             switch(response_type)
             {
               case 'text': 
@@ -97,9 +102,15 @@ export const createWppconnectBot = async () => {
                 await this.sendBase64AudioPtt(message.from, response.base64Audio, input, shouldSave)
               break;
               default:
-                await this.sendErrorMessage(message.from)
+                await this.sendErrorMessage(message, response_type, lang, `send_message_error`)
               break;
             }
+          }
+
+          catch(error) {
+            console.dir(error, {depth: null})
+            await this.sendErrorMessage(message, response_type, lang, `send_message_error`)
+          }
         },
 
         async sendText (chatId, text, shouldSave = true) {
@@ -126,7 +137,12 @@ export const createWppconnectBot = async () => {
           await repository.markMessagesAsReplied(chatId)
           return message
         },
-
+        async sendErrorMessage(message, response_type, lang, defaultMessage = null ) {
+          const input = await this.getOrTranslateMessage(message, defaultMessage, lang)
+          await this.sendTextOrBase64AudioPtt({
+            message, response_type, input
+          })
+        },
 
         async sendMaintenanceWarn({message, response_type, lang}) {
           const input = await this.getOrTranslateMessage(message, 'maintenance', lang)
@@ -138,12 +154,17 @@ export const createWppconnectBot = async () => {
         async getOrTranslateMessage(message, id, lang){
             const translation = await repository.getTranslation(id, lang)
             if(translation) return translation
+            
+            if(lang !== 'pt')
+            {
+              const response = await openaiCompletitions.generateTranslation(defaultMessages[id], lang)
+              await repository.upsertCredits(message.from, response.amountSpent)
+              await repository.upsertTranslation(id, lang, response.translation)
+              return response.translation
+            }
 
-            const response = await openaiCompletitions.generateTranslation(defaultMessages[id], lang)
-            console.log(20, message)
-            await repository.upsertCredits(message.from, response.amountSpent)
-            await repository.upsertTranslation(id, lang, response.translation)
-            return response.translation
+            return defaultMessages[id]
+            
         },
 
         async sendUsageLimitReachedMessage({response_type, lang, message}){

@@ -39,12 +39,10 @@ export default async function({client, message}) {
         {
             if(function_call.type === 'function') {
                 const action = tools.find(func => func.function.name === function_call.function.name)
-                await action.function.call({client, message, ...JSON.parse(function_call.function.arguments)})
+                action.function.call({client, message, ...JSON.parse(function_call.function.arguments)})
             }
         }
     }
-    
-
 }
 
 

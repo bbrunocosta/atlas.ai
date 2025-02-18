@@ -21,23 +21,29 @@ export default {
       required: ["prompt", "input", "response_type", "lang" ]
     },
     async call ({prompt, client, message, input, response_type, lang }) {    
+      try {
 
-      await client.sendTextOrBase64AudioPtt({
-        message, response_type, input, lang 
-      })
-
-      const {base64Image, caption, fileName, amountSpent} = await openaiVision.generateImage(prompt, lang)
-      const credits = await repository.upsertCredits(message.from, amountSpent)
-      await client.sendBase64ImageWithTextOrAudioCaption({
-        message, response_type, base64Image, fileName, caption,
-      })
-
-      if(client.exceedUsage(credits)) {
-        await client.sendUsageLimitReachedMessage({
-          message, response_type, lang
+        await client.sendTextOrBase64AudioPtt({
+          message, response_type, input, lang 
         })
-      }
 
+        const {base64Image, caption, fileName, amountSpent} = await openaiVision.generateImage(prompt, lang)
+        const credits = await repository.upsertCredits(message.from, amountSpent)
+        await client.sendBase64ImageWithTextOrAudioCaption({
+          message, response_type, base64Image, fileName, caption, lang
+        })
+
+        if(client.exceedUsage(credits)) {
+          await client.sendUsageLimitReachedMessage({
+            message, response_type, lang
+          })
+        }
+      }
+      
+      catch(error) {
+        console.dir(error, {depth: null})
+        await client.sendErrorMessage(message, response_type, lang, 'generate_image_error')
+      }
     }
   }
 }
