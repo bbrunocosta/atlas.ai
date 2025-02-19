@@ -2,3 +2,5 @@ node_modules
 tokens
 .env
 chat_history.db
+.log
+.O

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es2017", // ou superior, como 'es2018', 'es2019', etc.
+    "module": "esnext", // ou 'es2022', 'system', 'node16', 'nodenext'
+    "moduleResolution": "node",
+    "allowJs": false,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
+}
