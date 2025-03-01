@@ -14,4 +14,10 @@ export interface StorePort
   deleteUntil(chatId: string, timestamp): Promise<void>
   getChatMetadata(chatId: string): Promise<{lang: string, response_type: 'text' | 'audio'} | null>
   setChatMetadata(chatId: string, metadata:{ response_type: 'text' | 'audio', lang: string }): Promise<void>
+
+  isReplying(chatId: string): Promise<boolean>
+  
+  startReplying(chatId: string): Promise<void>
+
+  stopReplying(chatId: string): Promise<void>
 }

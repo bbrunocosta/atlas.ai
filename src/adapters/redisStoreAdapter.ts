@@ -140,6 +140,18 @@ class redisStoreAdapter implements StorePort
       throw error
     }
   }
+
+  async isReplying(chatId: string){
+    return (await this.redis.exists(`r_state:${chatId}`)) === 1
+  }
+  
+  async startReplying(chatId: string){
+    await this.redis.set(`r_state:${chatId}`, '', 'NX')
+  }
+
+  async stopReplying(chatId: string){
+    await this.redis.del(`r_state:${chatId}`)
+  }
 }
 
 
