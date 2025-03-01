@@ -30,7 +30,8 @@ import GenerateBalanceResponseExecutor from "./domain/ai/functions/GenerateBalan
 
 import DefaultMessages from "./domain/errors/errorMessages";
 import HandleMisunderstandingExecutor from "./domain/ai/functions/HandleMisunderstandingExecutor";
-import { stat } from "fs";
+import AwsS3FileStoreAdapter from "./adapters/awsS3FileStoreAdapter";
+import awsS3Config from "./config/aws-s3.config";
 
 const defaultMessages = new DefaultMessages()
 
@@ -55,13 +56,13 @@ const aiVisionPort = new OpenAiVisionAdapter(openAi, aiCompletitionsPort, aiUsag
 
 
 const messageFactory = new MessageFactory(aiTranscriptionPort, messageRepository, usageRepository, defaultMessages)
-
+const fileStorePort = new AwsS3FileStoreAdapter(awsS3Config.bucket, awsS3Config.region)
 
 const wppConnectClient = await wppconnect.create(wppConnectConfig);
-const messagePort = new WppConnectAdapter(wppConnectClient, messageFactory, storePort, eventBuss)
+const messagePort = new WppConnectAdapter(wppConnectClient, messageFactory, fileStorePort, eventBuss)
 
 
-const generateImageResponseExecutor = new GenerateImageResponseExecutor(messagePort, messageFactory, aiVisionPort, usageRepository, messageRepository )
+const generateImageResponseExecutor = new GenerateImageResponseExecutor(messagePort, messageFactory, aiVisionPort, usageRepository )
 const generateBalanceResponseExecutor = new GenerateBalanceResponseExecutor(usageRepository, messageRepository, messagePort,  messageFactory )
 const handleMisunderstandingExecutor = new HandleMisunderstandingExecutor(messageRepository, messagePort, messageFactory)
 
@@ -99,8 +100,20 @@ messagePort.onMessageReceived(async (message: Message): Promise<void> => {
 eventBuss.onPresenceStateDebounced(async currentState => {
   try {
     const messageCount = await eventBuss.getMessagesCount(currentState.chatId)
-    if(currentState.state === 'unavailable' && messageCount > 0 ) {
-      await aiService.HandleMessageReceived(currentState.chatId)
+    const isReplying = await storePort.isReplying(currentState.chatId)
+    if(currentState.state === 'unavailable' && messageCount > 0 && !isReplying) {
+      try {
+        await storePort.startReplying(currentState.chatId)
+        await aiService.HandleMessageReceived(currentState.chatId)
+      }
+      
+      catch(error ) {
+        console.error('index.onPresenceStateDebounced.error',error)
+      }
+
+      finally {
+        await storePort.stopReplying(currentState.chatId)
+      }
     }
   }
 
@@ -111,7 +124,13 @@ eventBuss.onPresenceStateDebounced(async currentState => {
 
 
 eventBuss.onMessageSent(async (message: Message) => {
-  try{
+  try {
+    if(message.image) {
+      const url = await fileStorePort.set(message.id.replace('@c.us', '__'), Buffer.from(message.image.split('base64,',)[1], 'base64'), 'image/jpeg')
+      message.url = url
+      message.mimeType = 'image/jpeg'
+    }
+    
     await messageRepository.saveMessage(message)
     await messageRepository.markMessagesAsReplied(message.chatId)
     await storePort.deleteUntil(message.chatId, message.timestamp)
@@ -120,6 +139,12 @@ eventBuss.onMessageSent(async (message: Message) => {
   catch(error){
     console.error('index.eventBuss.onMessageSent.error', error)
   }
+})
+
+eventBuss.onNotSuportedMessageType(async chatId => {
+  const metadata = await storePort.getChatMetadata(chatId)
+  const message = await messageFactory.FromCode(chatId, metadata?.response_type, metadata?.lang, 'unsupported_message_type')
+  await messagePort.sendText(message);
 })
 
 

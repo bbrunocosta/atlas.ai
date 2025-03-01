@@ -36,7 +36,7 @@ class AwsS3FileStoreAdapter implements FileStorePort {
         ContentType: contentType,
       }));
 
-      return `https://${this.bucketName}.s3.amazonaws.com/${id}`
+      return `http://${this.bucketName}.s3.amazonaws.com/${id}`
     } catch (error) {
       throw new Error(`Error uploading file to S3: ${error.message}`);
     }

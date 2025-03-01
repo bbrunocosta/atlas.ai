@@ -12,8 +12,7 @@ export class GenerateImageResponseExecutor implements AiFunctionCallExecutor {
     private readonly messagePort: MessagePort,
     private readonly messageFactory: MessageFactory,
     private readonly AiVisionPort: AiVisionPort,
-    private readonly usageRepository: UsageRepository,
-    private readonly messageRepository: MessageRepository
+    private readonly usageRepository: UsageRepository
   ){}
   
   readonly name = 'generateImageResponse'
@@ -25,7 +24,7 @@ export class GenerateImageResponseExecutor implements AiFunctionCallExecutor {
       
       const {base64Image, caption, fileName, amountSpent} = await this.AiVisionPort.generateImage(prompt, lang)
       await this.usageRepository.upsertCredits(chatId, amountSpent)
-      
+
       const imageMessage = await this.messageFactory.FromImage( chatId, response_type, base64Image, fileName, caption)
       await this.messagePort.sendMessage(imageMessage)
     }

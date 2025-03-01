@@ -4,22 +4,28 @@ import { MessagePort } from '../ports/MessagePort';
 import Message from '../domain/entites/message';
 import { MessageFactory } from '../domain/entites/messageFactory'
 
-import { StorePort } from '../ports/StorePort';
 import { EventBussPort } from '../ports/EventBussPort';
+
 class WppConnectAdapter implements MessagePort
 {
   constructor(
     private readonly wppConnectClient: Whatsapp,
     private readonly messageFactory: MessageFactory,
-    private readonly storePort: StorePort,
+    private readonly fileStorePort: FileStorePort,
     private readonly eventBussPort: EventBussPort
   ){}
 
   onMessageReceived(callback: (message: Message) => Promise<void>): void {
     this.wppConnectClient.onMessage(async wppConnectMessage => {
+      if(!['chat', 'ptt', 'image'].includes(wppConnectMessage.type)){
+        await this.eventBussPort.emitNotSuportedMessageType(wppConnectMessage.from)
+        return;
+      }
+
       try {
         const audio = wppConnectMessage.type === 'ptt' ? await this.wppConnectClient.downloadMedia(wppConnectMessage) : null
-        const image = wppConnectMessage.type === 'image' ? await this.wppConnectClient.downloadMedia(wppConnectMessage) : null
+        const image = wppConnectMessage.type === 'image' ? await this.wppConnectClient.downloadMedia(wppConnectMessage): null
+        const url =  wppConnectMessage.type === 'image' ? await this.fileStorePort.set(wppConnectMessage.id.replace('@c.us', '__'), Buffer.from(image.split('base64,',)[1], 'base64'), wppConnectMessage.mimetype)  : null
         const message = await this.messageFactory.FromUser
         (
           wppConnectMessage.id, 
@@ -27,6 +33,8 @@ class WppConnectAdapter implements MessagePort
           wppConnectMessage.body,
           audio,
           image,
+          url,
+          wppConnectMessage.mimetype,
           wppConnectMessage.caption,
           wppConnectMessage.t
         )

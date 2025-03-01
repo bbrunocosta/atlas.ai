@@ -20,7 +20,7 @@ export class MessageFactory
   {
     try {
       const message = new Message()
-      message.withImage(image, fileName, caption)
+      message.withImage(image, fileName, undefined, undefined, caption)
       message.withchatId(chatId).withRole('assistant')
       
       
@@ -101,7 +101,7 @@ export class MessageFactory
     }
   }
 
-  async FromUser(id: string, chatId: string,  text: string | null, audio: string | null, image: string | null, caption: string |  null, timestamp: number): Promise<Message>{
+  async FromUser(id: string, chatId: string,  text: string | null, audio: string | null, image: string | null, url: string| null, mimeType: string| null, caption: string |  null, timestamp: number): Promise<Message>{
     try {
 
       const message = new Message()
@@ -116,7 +116,7 @@ export class MessageFactory
         const text = await this.transcriptAudioIntoText(chatId, audio)
         message.withAudio(audio).withText(text)
       }
-      if(image) message.withImage(image, caption)
+      if(image) message.withImage(image, 'image.jpg', url, mimeType, caption)
   
       return message
     }

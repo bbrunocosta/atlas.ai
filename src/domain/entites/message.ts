@@ -9,6 +9,7 @@ class Message
     public audioCaption?: string
     
     public image?: string
+    public url?: string
     public fileName?: string
     public caption?: string
     
@@ -57,12 +58,13 @@ class Message
       return this
     }
 
-    withImage(image: string, fileName: string, caption?: string) {
+    withImage(image: string, fileName: string, url?: string, mimeType?: string, caption?: string) {
       if(image && !fileName) throw new Error('fileName is required')
-      this.mimeType = ''
       this.image = image
       this.fileName = fileName
       this.caption = caption
+      this.url = url
+      this.mimeType = mimeType
       return this
     }
 }
