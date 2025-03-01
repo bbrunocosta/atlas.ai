@@ -17,8 +17,12 @@ class RedisEventBussAdapter implements EventBussPort{
   }
 
 
+  async emitNotSuportedMessageType(chatId: string): Promise<void> {
+    await this.publisher.publish('not_supported_message_type', JSON.stringify(chatId))
+  }
+
   async emitMessageSent(message: Message): Promise<void> {
-    this.publisher.publish('message_sent', JSON.stringify(message))
+    await this.publisher.publish('message_sent', JSON.stringify(message))
   }
 
 
@@ -32,6 +36,18 @@ class RedisEventBussAdapter implements EventBussPort{
     return  result
   }
 
+
+  onNotSuportedMessageType(callback: (chatId: string) => Promise<void>): void {
+    try { 
+      this.subscriber.subscribe('not_supported_message_type')
+      this.emitter.on('not_supported_message_type', async (chatId: string) => {
+        await callback(chatId) 
+      })
+    }
+    catch(error){ 
+      console.error('RedisEventBussAdapter.onNotSuportedMessageType.callback.Error') 
+    }
+  }
 
   onMessageSent(callback: (message: Message) => Promise<void>): void {
     try { 
