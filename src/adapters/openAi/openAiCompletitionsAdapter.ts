@@ -28,25 +28,26 @@ class OpenAiCompletitionsAdapter implements AiCompletitionPort {
     {
       console.log(attempt, 'Calling generateAtlasResponse...')
       try {  
-        const imageMetadata = z.object({
+        const response_format = z.object({
           lang: z.string().describe("The language the user wants to speak."),
           response_type: z.enum(['audio', 'text']).describe("Whether the message should be sent in text or audio"),
           message: z.string().describe("The response for the user's last query in text, in the same language as 'lang'."),
         });
         
         const options: ChatCompletionCreateParamsNonStreaming = {
+          tool_choice: chatHistory.replied.length ? 'auto': 'none',
+          parallel_tool_calls: false,
           model: "gpt-4o-mini",
           messages: [
             { role: 'developer', content: infoBrunoCosta },
             { role: 'developer', content: infoAtlas },
             { role: 'developer', content: infoUsage },
             { role: 'developer', content: infoDateTime(chatId) },
-            { role: 'developer', content: infoWhatsapp},
+            { role: 'developer', content: infoWhatsapp },
             { role: 'developer', content: 'escreva respostas curtas com no máximo 2 paragrafos'},
           ],
-          response_format: zodResponseFormat(imageMetadata, "response"),
+          response_format: zodResponseFormat(response_format, "response"),
           temperature: 0,
-          max_tokens: 4000,
           tools: [
             ...this.functions.map(func => ({
               type: 'function',
@@ -77,13 +78,15 @@ class OpenAiCompletitionsAdapter implements AiCompletitionPort {
         const finish_reason = response.choices[0].finish_reason
         console.log('finish_reason: ', finish_reason)
         if(finish_reason  === 'length') {
+          console.dir(response)
           if(maxAttempts === attempt){
             return {
-              response_type: 'text',
-              lang: 'pt',
-              message: 'Infelizmente não consegui processar sua reposta, você poderia reformular sua pergunta? uma pequena aleração no texto já pode ser suficiente.',
+              message: null,
+              lang: null,
+              response_type: null,
               functions: null, 
               amountSpent,
+              error: 'generate_text_error'
             }
           }
           else continue;
@@ -102,6 +105,7 @@ class OpenAiCompletitionsAdapter implements AiCompletitionPort {
         console.error('OpenAiCompletitionsAdapter.generateAtlasResponse.error', error)
 
         return {
+          error: null,
           response_type: 'text',
           lang: 'pt',
           message: 'Houve um erro ao processar sua solicitação. Tente novamente mais tarde.',
@@ -184,7 +188,7 @@ class OpenAiCompletitionsAdapter implements AiCompletitionPort {
   }
 
 
-  private mapMessage({role, text, image, caption}: Message) {
+  private mapMessage({role, text, image, caption, url}: Message) {
     const message = {
       role, 
       content: []
@@ -200,7 +204,7 @@ class OpenAiCompletitionsAdapter implements AiCompletitionPort {
     if(image && role != 'assistant') {
       message.content.push({ 
         type: 'image_url', 
-        image_url: {  url: image } 
+        image_url: {  url: url || image } 
       })
     }
 

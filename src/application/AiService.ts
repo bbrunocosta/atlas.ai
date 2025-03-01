@@ -6,6 +6,7 @@ import { AiCompletitionPort } from "../ports/AiCompletitionsPort";
 import { MessagePort } from "../ports/MessagePort";
 import { AiFunctionCallExecutor } from "../domain/ai/functions/AiFunctionCall";
 import { StorePort } from "../ports/StorePort";
+import { error } from "console";
 
 class AiService {
     constructor(
@@ -34,8 +35,14 @@ class AiService {
 
         const chatHistory = await  this.messageRepository.getChatHistory(chatId)
         const response = await this.AiCompletitionsPort.generateAtlasResponse(chatId, chatHistory)
-        
         await this.usageRepository.upsertCredits(chatId, response.amountSpent)
+        
+        
+        if(response.error){
+            const errorMessage = await this.messageFactory.FromCode(chatId, metadata?.response_type ?? 'text', metadata?.lang ?? 'pt', response.error)
+            await this.messagePort.sendMessage(errorMessage)
+        }
+
         
         if(response.functions?.length) {
             for(const function_call of response.functions)

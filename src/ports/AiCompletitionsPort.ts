@@ -1,4 +1,5 @@
 import Message from "../domain/entites/message"
+import DefaultMessages from "../domain/errors/errorMessages"
 
 export interface AiCompletitionPort {
   generateAtlasResponse(chatId: string, chatHistory: {replied: Message[], notReplied: Message[]}): Promise<AiCompletitionResponse>
@@ -8,6 +9,7 @@ export interface AiCompletitionPort {
 
 export interface AiCompletitionResponse {
   amountSpent: number
+  error: keyof DefaultMessages,
   functions: {
     name: string,
     arguments: string

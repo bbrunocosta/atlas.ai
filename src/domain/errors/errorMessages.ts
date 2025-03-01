@@ -33,6 +33,10 @@ class DefaultMessages {
   readonly unsupported_message_type =
   `🚨 Ixx! Eu ainda não consigo entender esse tipo mensagem... 😕\n` +
   `Vamos tentar outra coisa?`
+
+  readonly generate_text_error =
+  `🎨🚨 Ops! Não consegui processar essa mensagem...\n` +
+  `Pode tentar novamente? Às vezes, pequenos ajustes na descrição podem ajudar! \n`
 }
 
 export default DefaultMessages
