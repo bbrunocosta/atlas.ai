@@ -13,6 +13,7 @@
     "dev": "yarn tsx src/index.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
     "@types/node": "^22.13.4",
     "@wppconnect-team/wppconnect": "^1.35.2",
     "axios": "^1.7.9",

@@ -17,6 +17,7 @@ class Sqlite3RepositoryAdapter implements MessageRepository, UsageRepository{
         audio TEXT,
         audioCaption TEXT,
         image TEXT,
+        url TEXT,
         fileName TEXT,
         caption TEXT,
         isReplied INTEGER DEFAULT 0, 
@@ -69,9 +70,9 @@ class Sqlite3RepositoryAdapter implements MessageRepository, UsageRepository{
 
   async saveMessage(message: Message) {
     const result = await this.db.run(
-      `INSERT OR IGNORE INTO messages (id, chatId, role, text, audio, audioCaption, image, fileName, caption, isReplied, mimeType, lang, timestamp)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [message.id, message.chatId, message.role, message.text, message.audio, message.audioCaption, message.image, message.fileName, message.caption, message.isReplied, message.mimeType, message.lang, message.timestamp]
+      `INSERT OR IGNORE INTO messages (id, chatId, role, text, audio, audioCaption, image, fileName, caption, isReplied, mimeType, lang, timestamp, url)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [message.id, message.chatId, message.role, message.text, message.audio, message.audioCaption, message.image, message.fileName, message.caption, message.isReplied, message.mimeType, message.lang, message.timestamp, message.url]
     );
 
     return result.changes ? true : false
@@ -83,10 +84,10 @@ class Sqlite3RepositoryAdapter implements MessageRepository, UsageRepository{
     const result = await this.db.all(
       `
         SELECT 
-          JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'text', text, 'image', image, 'caption', caption, 'audio', audio, 'audioCaption', audioCaption, 'isReplied', isReplied ))
+          JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'text', text, 'image', image, 'url', url, 'caption', caption, 'audio', audio, 'audioCaption', audioCaption, 'isReplied', isReplied ))
           FILTER (WHERE isReplied = 1) AS replied,
   
-          JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'text', text, 'image', image, 'caption', caption,'audio', audio, 'audioCaption', audioCaption, 'isReplied', isReplied )) 
+          JSON_GROUP_ARRAY(JSON_OBJECT('role', role, 'text', text, 'image', image, 'url', url, 'caption', caption,'audio', audio, 'audioCaption', audioCaption, 'isReplied', isReplied )) 
           FILTER (WHERE isReplied = 0) AS notReplied
         FROM messages
         WHERE chatId = ?;
