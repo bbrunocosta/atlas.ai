@@ -1,18 +1,17 @@
 export default `
-## 🎟️ Como funciona o sistema  de Créditos?
+# Usage FAQ
+---
+## Como funciona o sistema  de Créditos?
 Cada usuário começa com 1000 créditos, que são consumidos conforme o uso dos modelos da OpenAI. À medida que trocamos mensagens, esses créditos vão sendo consumidos dependendo do tipo de interação que temos.
-
 Por exemplo, se você me pedir para gerar uma imagem, 240 créditos serão descontados do seu saldo. Se enviarmos várias mensagens em uma conversa, os créditos serão consumidos proporcionalmente ao volume de texto processado.
 
 ---
-## 🚨 O que acontece quando meus créditos acabam?
-
-Se você atingir o limite de *1000 créditos*, vou te avisar que o saldo chegou ao fim e que *não será possível continuar* até que seja tomada uma decisão sobre a extensão dos créditos.
-
-Se precisar de algo, é só me chamar ou falar direto com o Bruno! 😉
+## O que acontece quando meus créditos acabam?
+Se você consumir todo o seu limite de *1000 créditos*, vou te avisar que o saldo chegou ao fim e que *não será possível continuar com novas interações*.
+Mas se você deseja continuar usando meu serviço, você pode entrar em contato direto com o Bruno para que ele coloque mais créditos para você! 😉
 
 ---
-## 📊 Como os Créditos São Consumidos?
+## Quanto custa cada mensagem ?
 
 ### 💬 GPT-4o-mini (Conversas em Texto)
 - *Tokens de Entrada (prompt):* 900 créditos por milhão de tokens  
@@ -27,14 +26,22 @@ Se precisar de algo, é só me chamar ou falar direto com o Bruno! 😉
 ### 🔊 TTS-1 (Conversão de Texto para Fala)
 - *Cada minuto de áudio gerado custa:* 6 créditos  
 
+
 ---
+## Os créditos renovam automaticamente? 
+- *Não são renováveis*, então é bom usá-los com sabedoria.  
 
-## ⚖️ Política de Créditos
 
-- Posso adicionar mais créditos? ❌ Não, os créditos *não podem ser comprados ou adicionados manualmente*.  
-- Os créditos renovam automaticamente? ❌ *Não são renováveis*, então é bom usá-los com sabedoria.  
-- O que faço se meus créditos acabarem? 🤔 Você pode falar com o *Bruno* para discutir uma possível extensão.  
+---
+## O que faço se meus créditos acabarem? 
+- Você pode falar com o *Bruno* para discutir uma possível extensão.  
 
-📞 *Telefone:* +55 11 95996-3068  
+
+
+---
+## Como entro em contato com o Bruno?
+- Você pode falar com o *Bruno*  através dos links abaixo.
 🔗 *LinkedIn:* https://www.linkedin.com/in/bbrunocosta
+📞 *Telefone:* +55 11 95996-3068  
+---
 `

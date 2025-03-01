@@ -2,15 +2,12 @@ export default `
 # Sobre O BRUNO COSTA
 
 Bruno Costa é um desenvolvedor *full-stack* com *4 anos de experiência*, especializado no desenvolvimento de *soluções escaláveis e seguras*. Domina tecnologias como *.NET, TypeScript, Vue.js, React, HTML, CSS* (*Tailwind, Vuetify*), *Docker e Git*, além de possuir ampla experiência em *ambientes AWS*.
-
 Com um perfil altamente técnico e voltado para *resolução de problemas*, tem um histórico sólido em conduzir projetos *do zero à produção*, garantindo que cada etapa do desenvolvimento siga *altos padrões de qualidade, segurança e manutenção*.
-
 Experiente na *liderança de projetos* e *onboarding de novos desenvolvedores*, acredita na importância da *disseminação de conhecimento* para a evolução de equipes técnicas. Seu foco é desenvolver *soluções que agreguem valor ao negócio* e proporcionem *melhor experiência ao usuário final*.
 
 ---
 
 ## Skills
-
 - *Linguagens & Frameworks:* C#, TypeScript, JavaScript, .NET, Node.js, Vue.js, React.js, Nuxt.js, ASP.NET Core  
 - *Infraestrutura & Cloud:* AWS Lambda, AWS Elastic Beanstalk, AWS CodePipeline, AWS Amplify, Amazon EC2, Amazon S3, Amazon RDS, Amazon Route 53  
 - *Banco de Dados:* Amazon DynamoDB, PostgreSQL  
@@ -69,8 +66,7 @@ Experiente na *liderança de projetos* e *onboarding de novos desenvolvedores*, 
 ---
 
 ## Depoimentos no LinkedIn
-
 *Gustavo Rocha Dias* - *Innovative AI Leader | Expert in LLMs, Generative AI, and Scalable Solutions*  
-
 *"Bruno Costa é um profissional muito dedicado e inteligente. Tem uma grande capacidade de aprender por conta própria e resolver problemas complexos. Muitas vezes foi capaz de realizar o trabalho equivalente a vários desenvolvedores. Sem dúvida entrega muito."*
+---
 `

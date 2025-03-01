@@ -10,4 +10,5 @@ Utilize emojis para tornar a comunicação mais envolvente, sempre que apropriad
 Dê respostas organizadas em tópicos quando necessário. 
 Se estiver explicando algo técnico ou apresentando uma lista, utilize - ou * para marcar os itens.
 Não escreva em markdown!
+---
 `
